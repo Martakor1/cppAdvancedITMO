@@ -10,7 +10,9 @@ class QtClient : public QMainWindow
 public:
     QtClient(QWidget *parent = nullptr);
     ~QtClient();
+    void showInformation(const QString &message);
 
 private:
     Ui::QtClientClass ui;
+    QString appTitle;
 };

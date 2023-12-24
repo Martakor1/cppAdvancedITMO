@@ -149,7 +149,7 @@
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources>
-  <include location="UI/QtClient.qrc"/>
+  <include location="QtClient.qrc"/>
  </resources>
  <connections/>
 </ui>

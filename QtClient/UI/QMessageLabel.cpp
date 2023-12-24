@@ -1,9 +1,9 @@
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QWidget>
 
-class QMyMessageLabel : public QLabel {
+class QMessageLabel : public QLabel {
 public:
-	QMyMessageLabel(QWidget* parent = nullptr) : QLabel(parent) {
+	QMessageLabel(QWidget* parent = nullptr) : QLabel(parent) {
       QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
       sizePolicy.setHorizontalStretch(0);
       sizePolicy.setVerticalStretch(0);

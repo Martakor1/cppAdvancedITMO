@@ -27,9 +27,16 @@ int main()
 	ip::tcp::socket socket(context);
 	socket.connect(endpoint);
 	socket.write_some(buffer("GET /\n"));
-	async_read(socket, buffer(data, 1023), transfer_exactly(100), on_read);
-	async_read(socket, buffer(data, 1023), transfer_exactly(1000), on_read);
-	context.run_one();
-	context.poll_one();
+	//async_read(socket, buffer(data, 1023), on_read);
+	//читает из буфера (сокета) последовательно, записывает в буффер (всегда в начало)
+	//on_read - сколько считали или 0 если буфер закончился на чтение
+	async_read(socket, buffer(data, 1023), transfer_exactly(21), on_read);
+	async_read(socket, buffer(data, 1023), transfer_exactly(10), on_read);
+	async_read(socket, buffer(data, 1023), on_read);
+	memset(data, 0, 1024);
+	async_read(socket, buffer(data, 1023), on_read);
+	context.run();
+	/*context.poll_one();
+	context.poll_one();*/
 	return 0;
 }
