@@ -1,8 +1,10 @@
 ﻿// Client.cpp : Этот файл содержит функцию "main". Здесь начинается и заканчивается выполнение программы.
 //
-
+#include <SDKDDKVer.h>
 #include <iostream>
 #include <boost/asio.hpp>
+
+
 
 using namespace boost::asio;
 int main()
@@ -15,7 +17,7 @@ int main()
     ip::tcp::socket socket(context);
     socket.connect(endpoint, ec);
     while (true) {
-       
+
        if (ec) {
           std::cout << ec.message() << std::endl;
           return 0;
