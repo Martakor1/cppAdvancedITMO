@@ -1,16 +1,42 @@
 #include "Client.h"
 #include <QMessageBox>
-Client::Client(QtClient *uiWindow) : QObject(), clientSocket(this), uiWindow(uiWindow)
+#include <QJsonObject>
+#include <QJsonDocument>
+#include "ClientCommand.h"
+
+Client::Client() : QObject(), clientSocket(this)
 {
 	connect(&clientSocket, &QTcpSocket::connected, this, &Client::onSokConnected);
 	connect(&clientSocket, &QTcpSocket::disconnected, this, &Client::onSokDisconnected);
 	connect(&clientSocket, &QTcpSocket::errorOccurred, this, &Client::displaySokError);
 	connect(&clientSocket, &QTcpSocket::readyRead, this, &Client::onSokReadyRead);
+   uiWindow->show();
+   connectToServer();
+}
+
+Client::~Client() {
+   delete uiWindow;
 }
 
 void Client::connectToServer()
 {
 	clientSocket.connectToHost(hostAddress, port);
+}
+
+void Client::receiveMessage(const ChatMessage& msg)
+{
+   //vector.push_back(msg)... localCache.store() etc...
+   emit messageReceived(msg);
+}
+
+void Client::onSokConnected() {
+   ChatMessage msg("Hello world!", "Andrew Glazkov");
+   QJsonObject wrapper;
+   wrapper["domain"] = "msg";
+   wrapper["operation"] = "create";
+   wrapper["object"] = msg.toJson();
+   QJsonDocument a(wrapper);
+   clientSocket.write(a.toJson(QJsonDocument::Compact));
 }
 
 void Client::displaySokError(QAbstractSocket::SocketError socketError)
@@ -35,6 +61,29 @@ void Client::displaySokError(QAbstractSocket::SocketError socketError)
    // getFortuneButton->setEnabled(true);
 }
 
-void Client::onSokConnected() {
-   return; // остановились тут
+void Client::onSokReadyRead()
+{
+   QByteArray jsonData;
+   // create a QDataStream operating on the socket
+   QDataStream socketStream(&clientSocket);
+   for (;;) {
+      // we start a transaction so we can revert to the previous state in case we try to read more data than is available on the socket
+      socketStream.startTransaction();
+      // we try to read the JSON data 
+      socketStream >> jsonData;
+      if (socketStream.commitTransaction()) {
+
+         ClientCommand(this, jsonData.) // to char
+
+      }
+      else {
+         // the read failed, the socket goes automatically back to the state it was in before the transaction started
+         // we just exit the loop and wait for more data to become available
+         break;
+      }
+}
+
+
+void Client::onSokDisconnected()
+{
 }

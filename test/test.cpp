@@ -20,7 +20,7 @@ inline size_t customCompletion(const boost::system::error_code&, size_t bytes) {
 }
 
 
-int main()
+int main1()
 {
 	io_context context;
 	ip::tcp::endpoint endpoint(ip::address::from_string("192.168.0.1"), 80);
@@ -38,5 +38,12 @@ int main()
 	context.run();
 	/*context.poll_one();
 	context.poll_one();*/
+	return 0;
+}
+
+int main() {
+	int a = 5;
+	std::shared_ptr<int> ap(new int(8));
+	std::cout << *ap;
 	return 0;
 }

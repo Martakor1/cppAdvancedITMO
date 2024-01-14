@@ -3,7 +3,7 @@
 
 class QMessageLabel : public QLabel {
 public:
-	QMessageLabel(QWidget* parent = nullptr) : QLabel(parent) {
+	QMessageLabel(const QString &text, QWidget* parent = nullptr) : QLabel(parent) {
       QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
       sizePolicy.setHorizontalStretch(0);
       sizePolicy.setVerticalStretch(0);
@@ -19,6 +19,6 @@ public:
       this->setWordWrap(true);
       this->setMargin(10);
       this->setIndent(-1);
-      this->setText("Lal");
+      this->setText(text);
 	};
 };
