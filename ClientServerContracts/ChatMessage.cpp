@@ -5,6 +5,11 @@ ChatMessage::ChatMessage(const QString &text, const QString &username):
 {
 }
 
+ChatMessage::ChatMessage(const QJsonObject& jsonObj): 
+	ChatMessage(jsonObj["text"].toString(), jsonObj["username"].toString()) 
+{ 
+}
+
 const QString& ChatMessage::getText() const
 {
 	return text;

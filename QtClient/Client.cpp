@@ -3,6 +3,8 @@
 #include <QJsonObject>
 #include <QJsonDocument>
 #include "ClientCommand.h"
+#include "CommandParseException.cpp"
+#include <iostream>
 
 Client::Client() : QObject(), clientSocket(this)
 {
@@ -10,6 +12,8 @@ Client::Client() : QObject(), clientSocket(this)
 	connect(&clientSocket, &QTcpSocket::disconnected, this, &Client::onSokDisconnected);
 	connect(&clientSocket, &QTcpSocket::errorOccurred, this, &Client::displaySokError);
 	connect(&clientSocket, &QTcpSocket::readyRead, this, &Client::onSokReadyRead);
+
+   //connect(this, &Client::messageReceived, uiWindow, &QtClient::showChatMessage);
    uiWindow->show();
    connectToServer();
 }
@@ -23,10 +27,10 @@ void Client::connectToServer()
 	clientSocket.connectToHost(hostAddress, port);
 }
 
-void Client::receiveMessage(const ChatMessage& msg)
+void Client::receiveMessage(std::shared_ptr<const ChatMessage> msg)
 {
    //vector.push_back(msg)... localCache.store() etc...
-   emit messageReceived(msg);
+   emit messageReceived(*msg.get()); //не очень красивая запись, но в туториалах везде используется ссылка
 }
 
 void Client::onSokConnected() {
@@ -34,7 +38,7 @@ void Client::onSokConnected() {
    QJsonObject wrapper;
    wrapper["domain"] = "msg";
    wrapper["operation"] = "create";
-   wrapper["object"] = msg.toJson();
+   wrapper["dto"] = msg.toJson();
    QJsonDocument a(wrapper);
    clientSocket.write(a.toJson(QJsonDocument::Compact));
 }
@@ -61,8 +65,7 @@ void Client::displaySokError(QAbstractSocket::SocketError socketError)
    // getFortuneButton->setEnabled(true);
 }
 
-void Client::onSokReadyRead()
-{
+void Client::onSokReadyRead() {
    QByteArray jsonData;
    // create a QDataStream operating on the socket
    QDataStream socketStream(&clientSocket);
@@ -72,15 +75,20 @@ void Client::onSokReadyRead()
       // we try to read the JSON data 
       socketStream >> jsonData;
       if (socketStream.commitTransaction()) {
-
-         ClientCommand(this, jsonData.) // to char
-
+         try {
+            auto c = ClientCommand(this, jsonData); // to char
+            c.exec();
+         }
+         catch (CommandParseException& e) {
+            std::cout << e.what() << std::endl;
+         }
       }
       else {
          // the read failed, the socket goes automatically back to the state it was in before the transaction started
          // we just exit the loop and wait for more data to become available
-         break;
+         continue;
       }
+   }
 }
 
 

@@ -28,6 +28,6 @@ public:
 	Client();
 	~Client();
 	void connectToServer();
-	void receiveMessage(const ChatMessage &msg);
+	void receiveMessage(std::shared_ptr<const ChatMessage> msg);
 };
 

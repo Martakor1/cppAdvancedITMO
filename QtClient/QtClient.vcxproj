@@ -60,7 +60,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\myfolder\cppAdvancedITMO\ClientServerContracts;C:\Program Files\boost_1_83_0;%(AdditionalIncludeDirectories);$(Qt_INCLUDEPATH_)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\myfolder\cppAdvancedITMO\ClientServerContracts;D:\myfolder\cppAdvancedITMO\ClientServerContracts;C:\Program Files\boost_1_83_0;%(AdditionalIncludeDirectories);$(Qt_INCLUDEPATH_)</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -115,6 +115,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ClientCommand.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ClientServerContracts\ClientServerContracts.vcxproj">
+      <Project>{2ac98852-7f1f-444a-98da-bd9d37efe8f3}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">

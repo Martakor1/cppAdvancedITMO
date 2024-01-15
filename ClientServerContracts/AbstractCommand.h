@@ -1,5 +1,5 @@
 #pragma once
-#include <boost/UUID/uuid.hpp>
+//#include <boost/uuid/uuid.hpp>
 #include <QJsonObject>
 #include "AbstractDto.h"
 
@@ -12,10 +12,10 @@ public:
 protected:
 	Domain domain;
 	CrudType crud;
-	std::shared_ptr<const AbstractDto> objectp;
+	std::shared_ptr<const AbstractDto> dto;
 public:
 	AbstractCommand(const QByteArray& rawJson);
-	AbstractCommand(Domain domain, CrudType crud, const AbstractDto *object);
-	~AbstractCommand();
+	AbstractCommand(Domain domain, CrudType crud, const AbstractDto *dto);
+	//~AbstractCommand();
 	virtual void exec() = 0;
 };

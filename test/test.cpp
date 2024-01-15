@@ -6,6 +6,8 @@
 #include <iterator>
 #include <algorithm>
 #include <memory>
+#include <QString>
+#include <qjsonobject.h>
 
 using namespace boost::asio;
 char data[1024];
@@ -44,6 +46,10 @@ int main1()
 int main() {
 	int a = 5;
 	std::shared_ptr<int> ap(new int(8));
-	std::cout << *ap;
+	std::cout << *ap << "\n";
+	QString s;
+	QJsonObject obj;
+	std::cout << s.isNull() << "\n";
+	std::cout << obj["key"].toString().isNull();
 	return 0;
 }

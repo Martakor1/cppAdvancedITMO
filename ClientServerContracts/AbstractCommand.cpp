@@ -10,14 +10,15 @@ AbstractCommand::AbstractCommand(const QByteArray& rawJson)
 	QJsonDocument doc = QJsonDocument::fromJson(rawJson, &err);
 	if (err.error == QJsonParseError::NoError) {
 		if (doc.isObject()) {
-			QJsonObject obj = doc.object();
-			QString str = obj["domain"].toString();
+			QJsonObject jsonObj = doc.object();
+			QString str = jsonObj["domain"].toString();
 			if (str == "msg")
 				domain = Domain::msg;
 			else if (str == "login")
 				domain = Domain::login;
 			else throw CommandParseException("Unsuppoted domain");
-			str = obj["operation"].toString();
+
+			str = jsonObj["operation"].toString();
 			if (str == "create")
 				crud = CrudType::create;
 			else if (str == "update")
@@ -27,22 +28,24 @@ AbstractCommand::AbstractCommand(const QByteArray& rawJson)
 			else if (str == "delete")
 				crud = CrudType::del;
 			else throw CommandParseException("Unsuppoted crud");
-			if (!obj["object"].isObject()) throw CommandParseException("Payload is not object");
+
+			if (!jsonObj["dto"].isObject()) throw CommandParseException("Payload is not object");
+			QJsonObject dtoJson = jsonObj["dto"].toObject();
 
 			if (domain == Domain::msg) {
-				object = obj["object"].toObject();//parse
-				objectp = std::shared_ptr<AbstractDto>(new ChatMessage());
+				dto = std::shared_ptr<AbstractDto>(new ChatMessage(dtoJson));
 			}
-
-			else
-				return;
+			else if (domain == Domain::login) {
+				//todo
+			}
+			return;
 		}
 	}
 	throw CommandParseException("Message parse error");
 }
 
 
-AbstractCommand::AbstractCommand(Domain domain, CrudType crud, const AbstractDto *object) :
-	domain(domain), crud(crud), objectp(object)
+AbstractCommand::AbstractCommand(Domain domain, CrudType crud, const AbstractDto *dto) :
+	domain(domain), crud(crud), dto(dto)
 {
 }
