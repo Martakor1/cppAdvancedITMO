@@ -13,7 +13,7 @@ Client::Client() : QObject(), clientSocket(this)
 	connect(&clientSocket, &QTcpSocket::errorOccurred, this, &Client::displaySokError);
 	connect(&clientSocket, &QTcpSocket::readyRead, this, &Client::onSokReadyRead);
 
-   //connect(this, &Client::messageReceived, uiWindow, &QtClient::showChatMessage);
+   connect(this, &Client::messageReceived, uiWindow, &QtClient::showChatMessage);
    uiWindow->show();
    connectToServer();
 }
@@ -40,7 +40,8 @@ void Client::onSokConnected() {
    wrapper["operation"] = "create";
    wrapper["dto"] = msg.toJson();
    QJsonDocument a(wrapper);
-   clientSocket.write(a.toJson(QJsonDocument::Compact));
+   auto s = QDataStream(&clientSocket);
+   s << a.toJson(QJsonDocument::Compact);
 }
 
 void Client::displaySokError(QAbstractSocket::SocketError socketError)
@@ -68,6 +69,8 @@ void Client::displaySokError(QAbstractSocket::SocketError socketError)
 void Client::onSokReadyRead() {
    QByteArray jsonData;
    // create a QDataStream operating on the socket
+   auto bytes = clientSocket.bytesAvailable();
+   //auto arr = clientSocket.readAll();
    QDataStream socketStream(&clientSocket);
    for (;;) {
       // we start a transaction so we can revert to the previous state in case we try to read more data than is available on the socket
@@ -86,7 +89,7 @@ void Client::onSokReadyRead() {
       else {
          // the read failed, the socket goes automatically back to the state it was in before the transaction started
          // we just exit the loop and wait for more data to become available
-         continue;
+         break;
       }
    }
 }
