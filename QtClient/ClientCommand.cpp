@@ -21,5 +21,3 @@ void ClientCommand::exec()
 	}
 	return;
 }
-
-

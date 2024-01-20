@@ -16,6 +16,12 @@ public:
 public slots:
    void showChatMessage(const ChatMessage &msg);
 
+private slots:
+   void onSendClicked();
+
+signals:
+   void messageCreated(const ChatMessage &msg);
+
 private:
     Ui::QtClientClass ui;
     QString appTitle;

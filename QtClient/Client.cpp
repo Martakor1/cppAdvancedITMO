@@ -14,6 +14,7 @@ Client::Client() : QObject(), clientSocket(this)
 	connect(&clientSocket, &QTcpSocket::readyRead, this, &Client::onSokReadyRead);
 
    connect(this, &Client::messageReceived, uiWindow, &QtClient::showChatMessage);
+   connect(uiWindow, &QtClient::messageCreated, this, &Client::sendMessage);
    uiWindow->show();
    connectToServer();
 }
@@ -24,10 +25,11 @@ Client::~Client() {
 
 void Client::connectToServer()
 {
+   //TODO сделать reconnect и отрисовку сообщений о подключении
 	clientSocket.connectToHost(hostAddress, port);
 }
 
-void Client::receiveMessage(std::shared_ptr<const ChatMessage> msg)
+void Client::receiveMessage(std::shared_ptr<const ChatMessage> msg) // подумать в конце
 {
    //vector.push_back(msg)... localCache.store() etc...
    emit messageReceived(*msg.get()); //не очень красивая запись, но в туториалах везде используется ссылка
@@ -68,9 +70,6 @@ void Client::displaySokError(QAbstractSocket::SocketError socketError)
 
 void Client::onSokReadyRead() {
    QByteArray jsonData;
-   // create a QDataStream operating on the socket
-   auto bytes = clientSocket.bytesAvailable();
-   //auto arr = clientSocket.readAll();
    QDataStream socketStream(&clientSocket);
    for (;;) {
       // we start a transaction so we can revert to the previous state in case we try to read more data than is available on the socket
@@ -83,6 +82,7 @@ void Client::onSokReadyRead() {
             c.exec();
          }
          catch (CommandParseException& e) {
+            //некорректный json от сервера. Игнорируем?
             std::cout << e.what() << std::endl;
          }
       }
@@ -92,6 +92,16 @@ void Client::onSokReadyRead() {
          break;
       }
    }
+}
+
+void Client::sendMessage(const ChatMessage& msg)
+{
+   QJsonObject wrapper;
+   wrapper["domain"] = "msg";
+   wrapper["operation"] = "create";
+   wrapper["dto"] = msg.toJson();
+   QDataStream dataStream(&clientSocket);
+   dataStream << QJsonDocument(wrapper).toJson(QJsonDocument::Compact);
 }
 
 

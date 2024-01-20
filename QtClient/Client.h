@@ -21,6 +21,9 @@ private slots:
 	void displaySokError(QAbstractSocket::SocketError socketError);
 	void onSokReadyRead();
 
+public slots:
+	void sendMessage(const ChatMessage &msg);
+
 signals:
 	void messageReceived(const ChatMessage &msg);
 

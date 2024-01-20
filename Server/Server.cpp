@@ -16,7 +16,7 @@ using namespace boost::asio;
 class EchoConnection: public boost::enable_shared_from_this<EchoConnection> {
 private:
 	ip::tcp::socket socket_;
-	std::array<char, 128> message_;
+	std::array<char, 256> message_;
 public:
 	EchoConnection(const any_io_executor& context) : socket_(context), message_() {
 	}
@@ -34,7 +34,7 @@ private:
 	void on_read(const boost::system::error_code& err, size_t bytes) {
 		if (!err) {
 			std::cout << "red, thread id " << std::this_thread::get_id() << std::endl;
-			std::cout << "message is '" << message_.data() << "'" << " size " << bytes << std::endl;
+			std::cout << "message is '" << message_.data() + 4 << "'" << " size " << bytes << std::endl;
 			socket_.async_write_some(buffer(message_, bytes), boost::bind(&EchoConnection::on_write, shared_from_this(), _1, _2));
 		}
 		else {

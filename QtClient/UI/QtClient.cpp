@@ -1,11 +1,14 @@
 #include "QtClient.h"
-#include "QMessageLabel.cpp"
+#include "MessageWidget.cpp"
 #include <QMessageBox>
 
 QtClient::QtClient(QWidget *parent)
     : QMainWindow(parent), appTitle("Чат приложение")
 {
     ui.setupUi(this);
+    connect(ui.sendButton, &QPushButton::clicked, this, &QtClient::onSendClicked);
+    connect(ui.messageEdit, &QLineEdit::returnPressed, this, &QtClient::onSendClicked);
+    //connect(&ui.sendButton, &QPushButton::clicked, this, )
     /*auto genLabel = new QMyMessageLabel((ui.scrollAreaWidgetContents));*/
 
     /*ui.verticalLayout_2->addWidget(genLabel);*/
@@ -26,7 +29,17 @@ void QtClient::showInformation(const QString &message) {
    QMessageBox::information(this, appTitle, message);
 }
 
-void QtClient::showChatMessage(const ChatMessage& msg)
+void QtClient::showChatMessage(const ChatMessage& msg) //depending on who?
 {
-   ui.verticalLayout_chat->addWidget(new QMessageLabel(msg.getText(), ui.scrollAreaWidgetContents));
+   ui.verticalLayout_chat->addWidget(new MessageWidget("Andrew", msg.getText(), Qt::LayoutDirection::RightToLeft, ui.scrollAreaWidgetContents));
+}
+
+void QtClient::onSendClicked()
+{
+   QString text = ui.messageEdit->text();
+   if (!text.trimmed().isEmpty()) {
+      ChatMessage msg(text, "andrew"); //TODO NAME
+      emit messageCreated(msg);
+   }
+   ui.messageEdit->clear();
 }
