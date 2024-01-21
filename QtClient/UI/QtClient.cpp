@@ -1,5 +1,5 @@
 #include "QtClient.h"
-#include "MessageWidget.cpp"
+#include "MessageWidget.h"
 #include <QMessageBox>
 #include <QScrollBar>
 
@@ -14,9 +14,10 @@ QtClient::QtClient(QWidget *parent)
     connect(&client, &Client::socketError, this, &QtClient::onSocketError);
     connect(&client, &Client::messageReceived, this, &QtClient::showChatMessage);
     connect(this, &QtClient::messageCreated, &client, &Client::sendMessage);
-    this->show();
 
     connect(ui.scrollArea->verticalScrollBar(), &QScrollBar::rangeChanged, this, &QtClient::onScrollRangeChanged);
+    this->show();
+
     //connect(&ui.sendButton, &QPushButton::clicked, this, )
     /*auto genLabel = new QMyMessageLabel((ui.scrollAreaWidgetContents));*/
 
@@ -31,9 +32,6 @@ QtClient::QtClient(QWidget *parent)
     ui.verticalLayout_2->addItem(verticalSpacer);*/
 }
 
-QtClient::~QtClient()
-{}
-
 void QtClient::showInformation(const QString &message) {
    QMessageBox::information(this, appTitle, message);
 }
@@ -41,10 +39,15 @@ void QtClient::showInformation(const QString &message) {
 void QtClient::showChatMessage(const ChatMessage& msg) {
    auto layout = Qt::LayoutDirection::LeftToRight;
    const User& sender = client.getUserById(msg.getSenderId());
+   auto status = MessageWidget::Status::delivered;
    if (sender == client.getUser()) {
       layout = Qt::LayoutDirection::RightToLeft;
+      status = MessageWidget::Status::sending;
    }
-   ui.verticalLayout_chat->addWidget(new MessageWidget(sender.getUsername(), msg.getText(), layout, ui.scrollAreaWidgetContents));
+
+   auto pair = widgets.insert({ msg.getId(), sender.getUsername(), msg.getText(), layout, status, ui.scrollAreaWidgetContents });
+   
+   ui.verticalLayout_chat->addWidget(const_cast<MessageWidget *>(&(*pair.first)));
 }
 
 void QtClient::onSocketError(QAbstractSocket::SocketError socketError)

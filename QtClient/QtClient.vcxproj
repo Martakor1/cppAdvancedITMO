@@ -115,6 +115,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ClientCommand.h" />
+    <ClInclude Include="UI\MessageWidget.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ClientServerContracts\ClientServerContracts.vcxproj">

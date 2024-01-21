@@ -1,10 +1,9 @@
+#include "MessageWidget.h"
 #include <QVboxLayout>
-#include <QLabel>
-#include <QtWidgets/QWidget>
 
-class MessageWidget : public QWidget {
-public:
-   MessageWidget(const QString &sender, const QString &text, Qt::LayoutDirection horizontalAligment, QWidget* parent = nullptr) : QWidget(parent) {
+MessageWidget::MessageWidget(const QUuid& id, const QString &sender, const QString &text, Qt::LayoutDirection horizontalAligment, Status status, QWidget* parent)
+      : QWidget(parent), id(id), statusLabel(new QLabel())
+{
       auto verticalLayout = new QVBoxLayout(this);
       verticalLayout->setSpacing(6);
 
@@ -35,5 +34,37 @@ public:
       messageLabel->setText(text);
 
       verticalLayout->addWidget(messageLabel);
-	};
-};
+
+
+
+      statusLabel->setSizePolicy(QSizePolicy(QSizePolicy::Maximum, QSizePolicy::Minimum));
+      statusLabel->setLayoutDirection(horizontalAligment);
+      setStatus(status);
+      verticalLayout->addWidget(statusLabel.get());
+}
+MessageWidget::MessageWidget(const MessageWidget& other): id(other.getId()), statusLabel(other.getStatusLabel())
+{
+}
+;
+
+void MessageWidget::setStatus(Status newStatus) {
+   if (newStatus == Status::sending)
+      statusLabel->setText("Отправка");
+   else
+      statusLabel->setText("Доставлено");
+}
+
+std::shared_ptr<QLabel> MessageWidget::getStatusLabel() const
+{
+   return statusLabel;
+}
+
+const QUuid& MessageWidget::getId() const
+{
+   return id;
+}
+
+bool MessageWidget::operator==(const MessageWidget& other) const
+{
+   return id == other.getId();
+}
