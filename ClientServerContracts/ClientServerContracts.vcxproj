@@ -97,11 +97,13 @@
     <ClCompile Include="ChatMessage.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="CommandParseException.cpp" />
+    <ClCompile Include="User.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AbstractCommand.h" />
     <ClInclude Include="ChatMessage.h" />
     <ClInclude Include="AbstractDto.h" />
+    <ClInclude Include="User.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">

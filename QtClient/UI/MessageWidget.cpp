@@ -12,7 +12,6 @@ public:
       auto nameLabel = new QLabel();
       nameLabel->setSizePolicy(QSizePolicy(QSizePolicy::Maximum, QSizePolicy::Minimum));
       nameLabel->setLayoutDirection(horizontalAligment);
-      //nameLabel->setAlignment(Qt::AlignRight | Qt::AlignTrailing | Qt::AlignVCenter);
       nameLabel->setText(sender);
 
       verticalLayout->addWidget(nameLabel);

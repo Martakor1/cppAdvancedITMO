@@ -6,21 +6,21 @@
 #include "CommandParseException.cpp"
 #include <iostream>
 
-Client::Client() : QObject(), clientSocket(this)
+
+
+Client::Client() : QObject(), clientSocket(this), user("martakor")
 {
 	connect(&clientSocket, &QTcpSocket::connected, this, &Client::onSokConnected);
 	connect(&clientSocket, &QTcpSocket::disconnected, this, &Client::onSokDisconnected);
-	connect(&clientSocket, &QTcpSocket::errorOccurred, this, &Client::displaySokError);
+	connect(&clientSocket, &QTcpSocket::errorOccurred, this, &Client::socketError);
 	connect(&clientSocket, &QTcpSocket::readyRead, this, &Client::onSokReadyRead);
 
-   connect(this, &Client::messageReceived, uiWindow, &QtClient::showChatMessage);
-   connect(uiWindow, &QtClient::messageCreated, this, &Client::sendMessage);
-   uiWindow->show();
    connectToServer();
 }
 
-Client::~Client() {
-   delete uiWindow;
+const QTcpSocket& Client::getSocket() const
+{
+   return clientSocket;
 }
 
 void Client::connectToServer()
@@ -35,8 +35,19 @@ void Client::receiveMessage(std::shared_ptr<const ChatMessage> msg) // поду�
    emit messageReceived(*msg.get()); //не очень красивая запись, но в туториалах везде используется ссылка
 }
 
+const User& Client::getUserById(const QUuid& id) const
+{
+   //TODO: кеширование
+   return user;
+}
+
+const User& Client::getUser() const
+{
+   return user;
+}
+
 void Client::onSokConnected() {
-   ChatMessage msg("Hello world!", "Andrew Glazkov");
+   ChatMessage msg("Hello world!", user.getId(), QUuid::createUuid());
    QJsonObject wrapper;
    wrapper["domain"] = "msg";
    wrapper["operation"] = "create";
@@ -44,28 +55,6 @@ void Client::onSokConnected() {
    QJsonDocument a(wrapper);
    auto s = QDataStream(&clientSocket);
    s << a.toJson(QJsonDocument::Compact);
-}
-
-void Client::displaySokError(QAbstractSocket::SocketError socketError)
-{
-   switch (socketError) {
-   case QAbstractSocket::RemoteHostClosedError:
-      break;
-   case QAbstractSocket::HostNotFoundError:
-      uiWindow->showInformation("The host was not found. Please check the "
-         "host name and port settings.");
-      break;
-   case QAbstractSocket::ConnectionRefusedError:
-      uiWindow->showInformation("The connection was refused by the peer. "
-            "Make sure the fortune server is running, "
-            "and check that the host name and port "
-            "settings are correct.");
-      break;
-   default:
-      uiWindow->showInformation("The following error occurred: %1." + clientSocket.errorString());
-   }
-
-   // getFortuneButton->setEnabled(true);
 }
 
 void Client::onSokReadyRead() {

@@ -1,12 +1,13 @@
 #include "ChatMessage.h"
 
-ChatMessage::ChatMessage(const QString &text, const QString &username, const QUuid &id):
-	text(text), username(username), id(id)
+ChatMessage::ChatMessage(const QString &text, const QUuid &senderId, const QUuid& chatId, const QUuid &id):
+	text(text), senderId(senderId), id(id), chatId(chatId)
 {
 }
 
 ChatMessage::ChatMessage(const QJsonObject& jsonObj): 
-	ChatMessage(jsonObj["text"].toString(), jsonObj["username"].toString(), QUuid::fromString(jsonObj["id"].toString()))
+	ChatMessage(jsonObj["text"].toString(), QUuid::fromString(jsonObj["senderId"].toString()),
+		QUuid::fromString(jsonObj["chatId"].toString()), QUuid::fromString(jsonObj["id"].toString()))
 { 
 }
 
@@ -15,16 +16,27 @@ const QString& ChatMessage::getText() const
 	return text;
 }
 
-const QString& ChatMessage::getUsername() const
+const QUuid& ChatMessage::getSenderId() const
 {
-	return username;
+	return senderId;
+}
+
+const QUuid& ChatMessage::getId() const
+{
+	return id;
+}
+
+const QUuid& ChatMessage::getChatId() const
+{
+	return chatId;
 }
 
 QJsonObject ChatMessage::toJson() const
 {
 	QJsonObject obj;
-	obj["username"] = username;
+	obj["senderId"] = senderId.toString(QUuid::WithoutBraces);
 	obj["text"] = text;
 	obj["id"] = id.toString(QUuid::WithoutBraces);
+	obj["chatId"] = chatId.toString(QUuid::WithoutBraces);
 	return obj;
 }

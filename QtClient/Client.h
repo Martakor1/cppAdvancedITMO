@@ -2,9 +2,8 @@
 #include <QObject>
 #include <QTcpSocket>
 #include <QHostAddress>
-#include "UI/QtClient.h"
 #include "ChatMessage.h"
-
+#include "User.h"
 
 class Client : public QObject
 {
@@ -13,24 +12,26 @@ private:
 	QTcpSocket clientSocket;
 	const QHostAddress hostAddress = QHostAddress("127.0.0.1");
 	const quint16 port = 1000;
-	QtClient *uiWindow = new QtClient();
+	User user;
 
 private slots:
 	void onSokConnected();
 	void onSokDisconnected();
-	void displaySokError(QAbstractSocket::SocketError socketError);
 	void onSokReadyRead();
 
 public slots:
 	void sendMessage(const ChatMessage &msg);
+	void connectToServer();
 
 signals:
 	void messageReceived(const ChatMessage &msg);
+	void socketError(QAbstractSocket::SocketError socketError);
 
 public:
 	Client();
-	~Client();
-	void connectToServer();
+	const QTcpSocket& getSocket() const;
 	void receiveMessage(std::shared_ptr<const ChatMessage> msg);
+	const User& getUserById(const QUuid& id) const;
+	const User& getUser() const;
 };
 
