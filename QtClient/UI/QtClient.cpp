@@ -47,7 +47,8 @@ void QtClient::showChatMessage(const ChatMessage& msg) {
 
    auto pair = widgets.insert({ msg.getId(), sender.getUsername(), msg.getText(), layout, status, ui.scrollAreaWidgetContents });
    
-   ui.verticalLayout_chat->addWidget(const_cast<MessageWidget *>(&(*pair.first)));
+   MessageWidget *w = const_cast<MessageWidget*>(&(*pair.first));
+   ui.verticalLayout_chat->addWidget(w);
 }
 
 void QtClient::onSocketError(QAbstractSocket::SocketError socketError)
