@@ -1,6 +1,7 @@
 #include "QtClient.h"
 #include "MessageWidget.cpp"
 #include <QMessageBox>
+#include <QScrollBar>
 
 QtClient::QtClient(QWidget *parent)
     : QMainWindow(parent), appTitle("Чат приложение"), client()
@@ -14,6 +15,8 @@ QtClient::QtClient(QWidget *parent)
     connect(&client, &Client::messageReceived, this, &QtClient::showChatMessage);
     connect(this, &QtClient::messageCreated, &client, &Client::sendMessage);
     this->show();
+
+    connect(ui.scrollArea->verticalScrollBar(), &QScrollBar::rangeChanged, this, &QtClient::onScrollRangeChanged);
     //connect(&ui.sendButton, &QPushButton::clicked, this, )
     /*auto genLabel = new QMyMessageLabel((ui.scrollAreaWidgetContents));*/
 
@@ -72,4 +75,9 @@ void QtClient::onSendClicked()
       emit messageCreated(msg);
    }
    ui.messageEdit->clear();
+}
+
+void QtClient::onScrollRangeChanged(int min, int max)
+{
+   ui.scrollArea->verticalScrollBar()->setValue(max);
 }

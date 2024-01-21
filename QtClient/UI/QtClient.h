@@ -23,6 +23,7 @@ signals:
 
 private slots:
    void onSendClicked();
+   void onScrollRangeChanged(int min, int max);
 
 private:
     Client client;

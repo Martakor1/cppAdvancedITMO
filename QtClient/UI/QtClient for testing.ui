@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>915</width>
-    <height>451</height>
+    <height>447</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -38,7 +38,7 @@
          <x>0</x>
          <y>0</y>
          <width>895</width>
-         <height>356</height>
+         <height>352</height>
         </rect>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -95,21 +95,27 @@
          <layout class="QVBoxLayout" name="verticalLayout">
           <item>
            <widget class="QLabel" name="nameLabel">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
             <property name="layoutDirection">
-             <enum>Qt::LeftToRight</enum>
+             <enum>Qt::RightToLeft</enum>
             </property>
             <property name="text">
              <string>Andrew Glazkov</string>
             </property>
             <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
             </property>
            </widget>
           </item>
           <item>
            <widget class="QLabel" name="messageLabel">
             <property name="sizePolicy">
-             <sizepolicy hsizetype="Maximum" vsizetype="MinimumExpanding">
+             <sizepolicy hsizetype="Maximum" vsizetype="Minimum">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
