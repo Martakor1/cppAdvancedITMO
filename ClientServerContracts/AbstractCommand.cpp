@@ -1,5 +1,6 @@
 #include "AbstractCommand.h"
 #include <QJsonDocument>
+#include <QJsonObject>
 #include "CommandParseException.cpp"
 #include "ChatMessage.h"
 
@@ -45,7 +46,28 @@ AbstractCommand::AbstractCommand(const QByteArray& rawJson)
 }
 
 
-AbstractCommand::AbstractCommand(Domain domain, CrudType crud, const AbstractDto *dto) :
+AbstractCommand::AbstractCommand(Domain domain, CrudType crud, std::shared_ptr<AbstractDto> dto) :
 	domain(domain), crud(crud), dto(dto)
 {
+}
+
+const QByteArray AbstractCommand::toBytes() const
+{
+	QJsonObject wrapper;
+	if (domain == Domain::msg)
+		wrapper["domain"] = "msg";
+	else if (domain == Domain::login)
+		wrapper["domain"] = "login";
+
+	if (crud == CrudType::create)
+		wrapper["operation"] = "create";
+	else if (crud == CrudType::update)
+		wrapper["operation"] = "update";
+	else if (crud == CrudType::read)
+		wrapper["operation"] = "read";
+	else if (crud == CrudType::del)
+		wrapper["operation"] = "delete";
+
+	wrapper["dto"] = dto->toJson();
+	return QJsonDocument(wrapper).toJson(QJsonDocument::Compact);
 }

@@ -29,10 +29,10 @@ void Client::connectToServer()
 	clientSocket.connectToHost(hostAddress, port);
 }
 
-void Client::receiveMessage(std::shared_ptr<const ChatMessage> msg) // подумать в конце
+void Client::receiveMessage(std::shared_ptr<ChatMessage> msg) // подумать в конце
 {
-   //vector.push_back(msg)... localCache.store() etc...
-   emit messageReceived(*msg.get()); //не очень красивая запись, но в туториалах везде используется ссылка
+   msgContainer.insert(msg);
+   emit messageReceived(*msg); //не очень красивая запись, но в туториалах везде используется ссылка
 }
 
 const User& Client::getUserById(const QUuid& id) const
@@ -85,12 +85,10 @@ void Client::onSokReadyRead() {
 
 void Client::sendMessage(const ChatMessage& msg)
 {
-   QJsonObject wrapper;
-   wrapper["domain"] = "msg";
-   wrapper["operation"] = "create";
-   wrapper["dto"] = msg.toJson();
+   auto pair = msgContainer.insert(std::make_shared<ChatMessage>(msg));
+   ClientCommand sendCommand(this, ClientCommand::Domain::msg, ClientCommand::CrudType::create, *pair.first);
    QDataStream dataStream(&clientSocket);
-   dataStream << QJsonDocument(wrapper).toJson(QJsonDocument::Compact);
+   dataStream << sendCommand.toBytes();
 }
 
 

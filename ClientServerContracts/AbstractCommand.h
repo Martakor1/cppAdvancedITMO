@@ -2,6 +2,7 @@
 //#include <boost/uuid/uuid.hpp>
 #include <QJsonObject>
 #include "AbstractDto.h"
+#include <QByteArray>
 
 
 class AbstractCommand
@@ -12,10 +13,10 @@ public:
 protected:
 	Domain domain;
 	CrudType crud;
-	std::shared_ptr<const AbstractDto> dto;
+	std::shared_ptr<AbstractDto> dto;
 public:
 	AbstractCommand(const QByteArray& rawJson);
-	AbstractCommand(Domain domain, CrudType crud, const AbstractDto *dto);
-	//~AbstractCommand();
+	AbstractCommand(Domain domain, CrudType crud, std::shared_ptr<AbstractDto> dto);
+	const QByteArray toBytes() const;
 	virtual void exec() = 0;
 };

@@ -7,11 +7,7 @@
 #include <unordered_set>
 #include "MessageWidget.h"
 
-struct Hash {
-   size_t operator()(const QUuid &id) const {
-      return static_cast<size_t>(id.toBytes().data32[0]);
-   }
-};
+
 
 class QtClient : public QMainWindow
 {
@@ -33,8 +29,13 @@ private slots:
    void onScrollRangeChanged(int min, int max);
 
 private:
-    Client client;
-    Ui::QtClientClass ui;
-    QString appTitle;
-    std::unordered_map<QUuid, std::shared_ptr<MessageWidget>, Hash> widgets;
+   struct Hash {
+      size_t operator()(const QUuid& id) const {
+         return static_cast<size_t>(id.toBytes().data32[0]);
+      }
+   };
+   Client client;
+   Ui::QtClientClass ui;
+   QString appTitle;
+   std::unordered_map<QUuid, std::shared_ptr<MessageWidget>, Hash> widgets;
 };
