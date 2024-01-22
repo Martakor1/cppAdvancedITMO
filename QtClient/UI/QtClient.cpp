@@ -45,10 +45,8 @@ void QtClient::showChatMessage(const ChatMessage& msg) {
       status = MessageWidget::Status::sending;
    }
 
-   auto pair = widgets.insert({ msg.getId(), sender.getUsername(), msg.getText(), layout, status, ui.scrollAreaWidgetContents });
-   
-   MessageWidget *w = const_cast<MessageWidget*>(&(*pair.first));
-   ui.verticalLayout_chat->addWidget(w);
+   auto pair = widgets.insert({msg.getId(), std::make_shared<MessageWidget>(sender.getUsername(), msg.getText(), layout, status, ui.scrollAreaWidgetContents)});
+   ui.verticalLayout_chat->addWidget(pair.first->second.get());
 }
 
 void QtClient::onSocketError(QAbstractSocket::SocketError socketError)

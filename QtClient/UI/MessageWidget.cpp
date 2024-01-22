@@ -1,8 +1,8 @@
 #include "MessageWidget.h"
 #include <QVboxLayout>
 
-MessageWidget::MessageWidget(const QUuid& id, const QString &sender, const QString &text, Qt::LayoutDirection horizontalAligment, Status status, QWidget* parent)
-      : QWidget(parent), id(id), statusLabel(new QLabel())
+MessageWidget::MessageWidget(const QString &sender, const QString &text, Qt::LayoutDirection horizontalAligment, Status status, QWidget* parent)
+      : QWidget(parent), statusLabel(new QLabel())
 {
       auto verticalLayout = new QVBoxLayout(this);
       verticalLayout->setSpacing(6);
@@ -42,7 +42,7 @@ MessageWidget::MessageWidget(const QUuid& id, const QString &sender, const QStri
       setStatus(status);
       verticalLayout->addWidget(statusLabel.get());
 }
-MessageWidget::MessageWidget(const MessageWidget& other): id(other.getId()), statusLabel(other.getStatusLabel())
+MessageWidget::MessageWidget(const MessageWidget& other): statusLabel(other.getStatusLabel())
 {
 }
 ;
@@ -57,14 +57,4 @@ void MessageWidget::setStatus(Status newStatus) {
 std::shared_ptr<QLabel> MessageWidget::getStatusLabel() const
 {
    return statusLabel;
-}
-
-const QUuid& MessageWidget::getId() const
-{
-   return id;
-}
-
-bool MessageWidget::operator==(const MessageWidget& other) const
-{
-   return id == other.getId();
 }
