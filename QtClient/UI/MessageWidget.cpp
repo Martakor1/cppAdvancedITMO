@@ -1,21 +1,18 @@
 #include "MessageWidget.h"
 #include <QVboxLayout>
 
-MessageWidget::MessageWidget(const QString &sender, const QString &text, Qt::LayoutDirection horizontalAligment, Status status, QWidget* parent)
-      : QWidget(parent), statusLabel(new QLabel())
+MessageWidget::MessageWidget(const ChatMessage& msg, const QString &sender, Qt::LayoutDirection horizontalAligment, QWidget* parent)
+      : QWidget(parent), statusLabel(new QLabel(this)), nameLabel(new QLabel(this)), messageLabel(new QLabel(this))
 {
       auto verticalLayout = new QVBoxLayout(this);
       verticalLayout->setSpacing(6);
 
-
-      auto nameLabel = new QLabel();
       nameLabel->setSizePolicy(QSizePolicy(QSizePolicy::Maximum, QSizePolicy::Minimum));
       nameLabel->setLayoutDirection(horizontalAligment);
       nameLabel->setText(sender);
 
-      verticalLayout->addWidget(nameLabel);
+      verticalLayout->addWidget(nameLabel.get());
 
-      auto messageLabel = new QLabel();
       QSizePolicy sizePolicy1(QSizePolicy::Maximum, QSizePolicy::Minimum);
 
       sizePolicy1.setHeightForWidth(messageLabel->sizePolicy().hasHeightForWidth());
@@ -31,30 +28,30 @@ MessageWidget::MessageWidget(const QString &sender, const QString &text, Qt::Lay
       messageLabel->setWordWrap(true);
       messageLabel->setMargin(10);
       messageLabel->setIndent(-1);
-      messageLabel->setText(text);
+      messageLabel->setText(msg.getText());
 
-      verticalLayout->addWidget(messageLabel);
+      verticalLayout->addWidget(messageLabel.get());
 
 
 
       statusLabel->setSizePolicy(QSizePolicy(QSizePolicy::Maximum, QSizePolicy::Minimum));
       statusLabel->setLayoutDirection(horizontalAligment);
-      setStatus(status);
+      setStatus(msg.getStatus());
       verticalLayout->addWidget(statusLabel.get());
 }
-MessageWidget::MessageWidget(const MessageWidget& other): statusLabel(other.getStatusLabel())
-{
-}
-;
+//MessageWidget::MessageWidget(const MessageWidget& other): statusLabel(other.getStatusLabel())
+//{
+//}
+//;
 
-void MessageWidget::setStatus(Status newStatus) {
-   if (newStatus == Status::sending)
+void MessageWidget::setStatus(bool sended) {
+   if (sended == false)
       statusLabel->setText("Отправка");
    else
       statusLabel->setText("Доставлено");
 }
 
-std::shared_ptr<QLabel> MessageWidget::getStatusLabel() const
-{
-   return statusLabel;
+void MessageWidget::updateFromMsg(const ChatMessage& msg) {
+   setStatus(msg.getStatus());
+   messageLabel->setText(msg.getText());
 }

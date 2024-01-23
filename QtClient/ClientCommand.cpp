@@ -18,6 +18,9 @@ void ClientCommand::exec()
 			// вынести создание объектов в abstractcommand
 			client->receiveMessage(std::dynamic_pointer_cast<ChatMessage>(dto));
 		}
+		else if (crud == CrudType::update) { //протестировать update
+			client->updateMessage(std::dynamic_pointer_cast<ChatMessage>(dto));
+		}
 		// TODO аналогично
 	}
 	return;

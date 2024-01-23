@@ -35,6 +35,11 @@ void Client::receiveMessage(std::shared_ptr<ChatMessage> msg) // подумат�
    emit messageReceived(*msg); //не очень красивая запись, но в туториалах везде используется ссылка
 }
 
+void Client::updateMessage(std::shared_ptr<ChatMessage> msg) {
+   msgContainer.insert(msg); //проверить вставит ли вместо старого
+   emit messageUpdated(*msg);
+}
+
 const User& Client::getUserById(const QUuid& id) const
 {
    //TODO: кеширование
@@ -47,7 +52,7 @@ const User& Client::getUser() const
 }
 
 void Client::onSokConnected() {
-   ChatMessage msg("Hello world!", user.getId(), QUuid::createUuid());
+   ChatMessage msg("Hello world!", user.getId(), QUuid::createUuid(), false);
    QJsonObject wrapper;
    wrapper["domain"] = "msg";
    wrapper["operation"] = "create";
@@ -65,7 +70,7 @@ void Client::onSokReadyRead() {
       socketStream.startTransaction();
       // we try to read the JSON data 
       socketStream >> jsonData;
-      if (socketStream.commitTransaction()) {
+      if (socketStream.commitTransaction()) { //auto chek that read size of data in first 4 bytes
          try {
             auto c = ClientCommand(this, jsonData); // to char
             c.exec();

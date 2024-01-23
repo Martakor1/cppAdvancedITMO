@@ -16,6 +16,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QtClient", "QtClient\QtClie
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ClientServerContracts", "ClientServerContracts\ClientServerContracts.vcxproj", "{2AC98852-7F1F-444A-98DA-BD9D37EFE8F3}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Serverqt", "Serverqt\Serverqt.vcxproj", "{67024277-8F2C-4339-9387-23BA8879D0FB}"
+	ProjectSection(ProjectDependencies) = postProject
+		{2AC98852-7F1F-444A-98DA-BD9D37EFE8F3} = {2AC98852-7F1F-444A-98DA-BD9D37EFE8F3}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -64,6 +69,14 @@ Global
 		{2AC98852-7F1F-444A-98DA-BD9D37EFE8F3}.Release|x64.Build.0 = Release|x64
 		{2AC98852-7F1F-444A-98DA-BD9D37EFE8F3}.Release|x86.ActiveCfg = Release|x64
 		{2AC98852-7F1F-444A-98DA-BD9D37EFE8F3}.Release|x86.Build.0 = Release|x64
+		{67024277-8F2C-4339-9387-23BA8879D0FB}.Debug|x64.ActiveCfg = Debug|x64
+		{67024277-8F2C-4339-9387-23BA8879D0FB}.Debug|x64.Build.0 = Debug|x64
+		{67024277-8F2C-4339-9387-23BA8879D0FB}.Debug|x86.ActiveCfg = Debug|x64
+		{67024277-8F2C-4339-9387-23BA8879D0FB}.Debug|x86.Build.0 = Debug|x64
+		{67024277-8F2C-4339-9387-23BA8879D0FB}.Release|x64.ActiveCfg = Release|x64
+		{67024277-8F2C-4339-9387-23BA8879D0FB}.Release|x64.Build.0 = Release|x64
+		{67024277-8F2C-4339-9387-23BA8879D0FB}.Release|x86.ActiveCfg = Release|x64
+		{67024277-8F2C-4339-9387-23BA8879D0FB}.Release|x86.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

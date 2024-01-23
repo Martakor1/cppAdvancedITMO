@@ -14,6 +14,7 @@ QtClient::QtClient(QWidget *parent)
     connect(&client, &Client::socketError, this, &QtClient::onSocketError);
     connect(&client, &Client::messageReceived, this, &QtClient::showChatMessage);
     connect(this, &QtClient::messageCreated, &client, &Client::sendMessage);
+    connect(&client, &Client::messageUpdated, this, &QtClient::onMessageUpdated);
 
     connect(ui.scrollArea->verticalScrollBar(), &QScrollBar::rangeChanged, this, &QtClient::onScrollRangeChanged);
     this->show();
@@ -45,8 +46,13 @@ void QtClient::showChatMessage(const ChatMessage& msg) {
       status = MessageWidget::Status::sending;
    }
 
-   auto pair = widgets.insert({msg.getId(), std::make_shared<MessageWidget>(sender.getUsername(), msg.getText(), layout, status, ui.scrollAreaWidgetContents)});
+   auto pair = widgets.insert({msg.getId(), std::make_shared<MessageWidget>(msg, sender.getUsername(), layout, ui.scrollAreaWidgetContents)});
    ui.verticalLayout_chat->addWidget(pair.first->second.get());
+}
+
+void QtClient::onMessageUpdated(const ChatMessage& msg) {
+   auto widgetPtr = widgets.at(msg.getId());
+   widgetPtr->updateFromMsg(msg);
 }
 
 void QtClient::onSocketError(QAbstractSocket::SocketError socketError)
@@ -73,7 +79,7 @@ void QtClient::onSendClicked()
 {
    QString text = ui.messageEdit->text();
    if (!text.trimmed().isEmpty()) {
-      ChatMessage msg(text, client.getUser().getId(), QUuid::createUuid()); //TODO Chat
+      ChatMessage msg(text, client.getUser().getId(), QUuid::createUuid(), false); //TODO chatId
       emit messageCreated(msg);
    }
    ui.messageEdit->clear();

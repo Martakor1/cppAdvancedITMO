@@ -19,6 +19,7 @@ public:
 
 public slots:
    void showChatMessage(const ChatMessage &msg);
+   void onMessageUpdated(const ChatMessage &msg);
    void onSocketError(QAbstractSocket::SocketError socketError);
 
 signals:

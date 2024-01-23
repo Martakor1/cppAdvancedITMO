@@ -2,14 +2,18 @@
 #include <QLabel>
 #include <QtWidgets/QWidget>
 #include <QUuid>
+#include "ChatMessage.h"
+
 class MessageWidget : public QWidget {
 private:
-   std::shared_ptr<QLabel> statusLabel;
+   std::unique_ptr<QLabel> statusLabel;
+   std::unique_ptr<QLabel> nameLabel;
+   std::unique_ptr<QLabel> messageLabel;
 public:
-   enum class Status { delivered, sending };
-   MessageWidget(const QString& sender, const QString& text, Qt::LayoutDirection horizontalAligment, Status status, QWidget* parent = nullptr);
+   enum class Status { delivered, sending }; //можно убрать...
+   MessageWidget(const ChatMessage& msg, const QString& sender, Qt::LayoutDirection horizontalAligment, QWidget* parent = nullptr);
    MessageWidget(const MessageWidget& other);
-   void setStatus(Status newStatus);
-   std::shared_ptr<QLabel> getStatusLabel() const;
+   void updateFromMsg(const ChatMessage &msg);
+   void setStatus(bool sended);
    //bool operator==(const MessageWidget& other) const;
 };
