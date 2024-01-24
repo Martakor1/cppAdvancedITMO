@@ -39,10 +39,6 @@ MessageWidget::MessageWidget(const ChatMessage& msg, const QString &sender, Qt::
       setStatus(msg.getStatus());
       verticalLayout->addWidget(statusLabel.get());
 }
-//MessageWidget::MessageWidget(const MessageWidget& other): statusLabel(other.getStatusLabel())
-//{
-//}
-//;
 
 void MessageWidget::setStatus(bool sended) {
    if (sended == false)

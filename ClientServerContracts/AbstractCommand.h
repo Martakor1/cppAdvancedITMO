@@ -1,5 +1,4 @@
 #pragma once
-//#include <boost/uuid/uuid.hpp>
 #include <QJsonObject>
 #include "AbstractDto.h"
 #include <QByteArray>

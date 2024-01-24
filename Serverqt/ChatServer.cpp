@@ -37,22 +37,3 @@ ChatRoom& ChatServer::getChatRoom(const QUuid& chatId) {
 PasswordService& ChatServer::getPasswordService() {
 	return pswdService;
 }
-
-
-//void on_read(const boost::system::error_code&, size_t s) {
-//	std::cout << "on_read " << s << std::endl;
-//}
-//
-//size_t customCompletion(const boost::system::error_code&, size_t bytes) {
-//	std::cout << "completion function work " << bytes << std::endl;
-//	return 100;
-//}
-
-//void on_accept(const boost::system::error_code& err) {
-//	std::cout << "accepted" << std::endl;
-//}
-//
-//void handle_clients() {
-//	
-//}
-

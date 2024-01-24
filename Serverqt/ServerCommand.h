@@ -12,4 +12,3 @@ public:
 	ServerCommand(ClientConnection* cconn, Domain domain, CrudType crud, std::shared_ptr<AbstractDto> dto);
 	virtual void exec() override;
 };
-

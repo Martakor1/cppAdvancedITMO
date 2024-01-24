@@ -58,6 +58,5 @@ void ChatMessage::setStatus(bool isSended) {
 }
 
 ChatMessage::~ChatMessage() {
-	//почему-то heap corruption при удалении unordered_set<shared_ptr> было, пока оставлю
 	std::cout << "I'm die (msg)\n" << text.toStdString() << "\n";
 }

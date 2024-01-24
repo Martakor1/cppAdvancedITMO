@@ -33,11 +33,10 @@ const QTcpSocket& Client::getSocket() const
 
 void Client::connectToServer()
 {
-   //TODO сделать reconnect и отрисовку сообщений о подключении
 	clientSocket.connectToHost(hostAddress, port);
 }
 
-void Client::receiveMessage(std::shared_ptr<ChatMessage> msg) // подумать в конце
+void Client::receiveMessage(std::shared_ptr<ChatMessage> msg)
 {
    msgContainer.insert(msg);
    emit messageReceived(*msg); //не очень красивая запись, но в туториалах везде используется ссылка
@@ -69,7 +68,7 @@ void Client::sendDataAfterLogin() {
 }
 
 void Client::onSokConnected() {
-    if (user.getUsername() != "") //emit loginError();
+    if (user.getUsername() != "")
       sendCredentials(ClientCommand::CrudType::check, std::make_shared<User>(user));
 }
 
@@ -77,17 +76,14 @@ void Client::onSokReadyRead() {
    QByteArray jsonData;
    QDataStream socketStream(&clientSocket);
    for (;;) {
-      // we start a transaction so we can revert to the previous state in case we try to read more data than is available on the socket
       socketStream.startTransaction();
-      // we try to read the JSON data 
       socketStream >> jsonData;
       if (socketStream.commitTransaction()) { //auto chek that read size of data in first 4 bytes
          try {
-            auto c = ClientCommand(this, jsonData); // to char
+            auto c = ClientCommand(this, jsonData);
             c.exec();
          }
          catch (CommandParseException& e) {
-            //некорректный json от сервера. Игнорируем?
             std::cout << e.what() << std::endl;
          }
       }

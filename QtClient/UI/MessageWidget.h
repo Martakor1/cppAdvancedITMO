@@ -15,5 +15,4 @@ public:
    MessageWidget(const MessageWidget& other);
    void updateFromMsg(const ChatMessage &msg);
    void setStatus(bool sended);
-   //bool operator==(const MessageWidget& other) const;
 };

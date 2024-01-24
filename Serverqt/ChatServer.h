@@ -7,8 +7,6 @@
 class ClientConnection;
 
 class ChatServer : public boost::enable_shared_from_this<ChatServer> {
-	//либо сделать connection вложенным классом либо объединить в один?
-	//скорее вложенным. Server получает запросы и направляет на них коннекшены
 private:
 	boost::asio::ip::tcp::acceptor acceptor_;
 	ChatRoom uniqueChatRoom; //сейчас chatServer выполняет роль и контейнера всей информации. Возможно вынесение в отдельный msgService
