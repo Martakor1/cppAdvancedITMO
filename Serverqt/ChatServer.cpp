@@ -22,7 +22,6 @@ void ChatServer::start_listen() {
 
 void ChatServer::on_accept(std::shared_ptr<ClientConnection> newConnection, const boost::system::error_code& err) {
 	if (!err) {
-		uniqueChatRoom.connectClient(newConnection);
 		newConnection->async_handle();
 	}
 	else {
@@ -33,6 +32,10 @@ void ChatServer::on_accept(std::shared_ptr<ClientConnection> newConnection, cons
 
 ChatRoom& ChatServer::getChatRoom(const QUuid& chatId) {
 	return uniqueChatRoom; //TODO find by id
+}
+
+PasswordService& ChatServer::getPasswordService() {
+	return pswdService;
 }
 
 

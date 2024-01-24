@@ -5,6 +5,7 @@
 #include "ChatMessage.h"
 #include "User.h"
 #include <unordered_set>
+#include "ClientCommand.h"
 
 
 class Client : public QObject
@@ -28,6 +29,9 @@ private:
 	const quint16 port = 1000;
 	User user;
 	std::unordered_set<std::shared_ptr<ChatMessage>, Hash, Equality> msgContainer; //возможно можно и без shared_ptr, если владелец этот контейнер
+	bool credAsked = false;
+	void sendCommand(const ClientCommand& command);
+	
 
 private slots:
 	void onSokConnected();
@@ -38,17 +42,22 @@ private slots:
 public slots:
 	void onMessageCreated(const ChatMessage& msg);
 	void connectToServer();
+	void setCredentials(const User& user);
+	void setCredFromUi(QString& username, QString &password, int index);
 
 signals:
 	void messageReceived(const ChatMessage &msg);
 	void messageUpdated(const ChatMessage &msg);
 	void socketError(QAbstractSocket::SocketError sokErr);
+	void loginError();
 
 public:
 	Client();
 	void receiveMessage(std::shared_ptr<ChatMessage> msg);
 	void sendMessage(std::shared_ptr<ChatMessage> msg);
 	void updateMessage(std::shared_ptr<ChatMessage> msg);
+	void sendCredentials(ClientCommand::CrudType type, std::shared_ptr<User> user);
+	void sendDataAfterLogin();
 	const QTcpSocket& getSocket() const;
 	const User& getUserById(const QUuid& id) const;
 	const User& getUser() const;

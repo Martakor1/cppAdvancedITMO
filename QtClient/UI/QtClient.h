@@ -21,9 +21,11 @@ public slots:
    void showChatMessage(const ChatMessage &msg);
    void onMessageUpdated(const ChatMessage &msg);
    void onSocketError(QAbstractSocket::SocketError socketError);
+   void askCredentials();
 
 signals:
    void messageCreated(const ChatMessage &msg);
+   void credentialsProduced(QString& username, QString& password, int index);
 
 private slots:
    void onSendClicked();

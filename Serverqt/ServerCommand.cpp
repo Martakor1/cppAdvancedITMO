@@ -24,5 +24,10 @@ void ServerCommand::exec()
 		}*/
 		// TODO аналогично
 	}
+	else if (domain == Domain::login) {
+		if (crud == CrudType::check) {
+			clientConn->checkLogin(std::dynamic_pointer_cast<User>(dto));
+		}
+	}
 	return;
 }

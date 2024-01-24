@@ -35,6 +35,25 @@ void ClientConnection::sendMessage(ServerCommand::CrudType type, std::shared_ptr
 	sendBytesWithSize(sendCommand.toBytes());
 }
 
+void ClientConnection::sendLogin(ServerCommand::CrudType type, std::shared_ptr<User> usr) {
+	ServerCommand sendCommand(this, ServerCommand::Domain::login, type, usr);
+	sendBytesWithSize(sendCommand.toBytes());
+}
+
+
+void ClientConnection::checkLogin(std::shared_ptr<User> usr) {
+	bool result = serv->getPasswordService().checkOrCreate(usr);
+	if (result) {
+		clientId = usr->getId();
+		serv->getChatRoom(QUuid()).connectClient(shared_from_this());
+		loggedIn = true;
+		sendLogin(ServerCommand::CrudType::ok, usr);
+		
+	}
+	else {
+		sendLogin(ServerCommand::CrudType::del, usr);
+	}
+}
 
 void ClientConnection::on_read(const boost::system::error_code& err, size_t bytes) {
 	if (!err) {
@@ -47,6 +66,11 @@ void ClientConnection::on_read(const boost::system::error_code& err, size_t byte
 			if (st.commitTransaction()) {
 				try {
 					auto c = ServerCommand(this, jsonData);
+					if (!loggedIn) {
+						if (c.getDomain() != ServerCommand::Domain::login) {
+							throw CommandParseException("unlogged");
+						}
+					}
 					c.exec();
 				}
 				catch (CommandParseException& e) {
@@ -83,4 +107,11 @@ void ClientConnection::sendBytesWithSize(const QByteArray& array) {
 	QDataStream st(&buf, QIODevice::WriteOnly);
 	st << array;
 	socket_.async_write_some(buffer(buf.constData(), buf.size()), boost::bind(&ClientConnection::on_write, shared_from_this(), _1, _2));
+}
+
+ClientConnection::~ClientConnection() {
+	if (loggedIn) {
+		//roomsService.disconnect - типо того должно быть в идеале
+		serv->getChatRoom(QUuid()).disconnectClient(shared_from_this());
+	}
 }

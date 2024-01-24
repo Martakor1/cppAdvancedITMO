@@ -9,7 +9,7 @@
 
 
 
-Client::Client() : QObject(), clientSocket(this), user("martakor")
+Client::Client() : QObject(), clientSocket(this), user("", "")
 {
 	connect(&clientSocket, &QTcpSocket::connected, this, &Client::onSokConnected);
 	connect(&clientSocket, &QTcpSocket::disconnected, this, &Client::onSokDisconnected);
@@ -17,6 +17,7 @@ Client::Client() : QObject(), clientSocket(this), user("martakor")
 	connect(&clientSocket, &QTcpSocket::readyRead, this, &Client::onSokReadyRead);
 
    connectToServer();
+   
 }
 
 
@@ -59,20 +60,17 @@ const User& Client::getUser() const
    return user;
 }
 
-void Client::onSokConnected() {
+void Client::sendDataAfterLogin() {
    for (const auto& t : msgContainer) {
       if (!t->getStatus()) {
          sendMessage(t);
       }
    }
-   /*ChatMessage msg("Hello world!", user.getId(), QUuid::createUuid(), false);
-   QJsonObject wrapper;
-   wrapper["domain"] = "msg";
-   wrapper["operation"] = "create";
-   wrapper["dto"] = msg.toJson();
-   QJsonDocument a(wrapper);
-   auto s = QDataStream(&clientSocket);
-   s << a.toJson(QJsonDocument::Compact);*/
+}
+
+void Client::onSokConnected() {
+    if (user.getUsername() != "") //emit loginError();
+      sendCredentials(ClientCommand::CrudType::check, std::make_shared<User>(user));
 }
 
 void Client::onSokReadyRead() {
@@ -106,16 +104,35 @@ void Client::onMessageCreated(const ChatMessage& msg) {
    sendMessage(*pair.first);
 }
 
-void Client::sendMessage(std::shared_ptr<ChatMessage> msgPtr)
-{
-   ClientCommand sendCommand(this, ClientCommand::Domain::msg, ClientCommand::CrudType::create, msgPtr);
+void Client::sendCommand(const ClientCommand& command) {
    if (clientSocket.state() == QAbstractSocket::ConnectedState) {
       QDataStream dataStream(&clientSocket);
-      dataStream << sendCommand.toBytes();
+      dataStream << command.toBytes();
    }
+}
+
+void Client::sendMessage(std::shared_ptr<ChatMessage> msgPtr)
+{
+   ClientCommand comm(this, ClientCommand::Domain::msg, ClientCommand::CrudType::create, msgPtr);
+   sendCommand(comm);
 }
 
 
 void Client::onSokDisconnected()
 {
+}
+
+void Client::setCredentials(const User& other) {
+   user = other;
+}
+
+void Client::setCredFromUi(QString& username, QString& password, int index) {
+   User u(username, password);
+   setCredentials(u);
+   sendCredentials(ClientCommand::CrudType::check, std::make_shared<User>(u));
+}
+
+void Client::sendCredentials(ClientCommand::CrudType type, std::shared_ptr<User> user) {
+   ClientCommand sendCredCommand(this, ClientCommand::Domain::login, type, user);
+   sendCommand(sendCredCommand);
 }

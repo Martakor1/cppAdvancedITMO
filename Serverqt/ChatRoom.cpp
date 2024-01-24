@@ -6,6 +6,9 @@ ChatRoom::ChatRoom(): msgs(), clients() {}
 
 void ChatRoom::connectClient(std::shared_ptr<ClientConnection> client) {
 	clients.insert(client);
+	for (const auto& msg : msgs) {
+		client->sendMessage(ServerCommand::CrudType::create, msg);
+	}
 }
 
 void ChatRoom::disconnectClient(std::shared_ptr<ClientConnection> client) {

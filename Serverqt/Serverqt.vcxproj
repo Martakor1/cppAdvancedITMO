@@ -15,12 +15,14 @@
     <ClCompile Include="ClientConnection.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="ChatServer.cpp" />
+    <ClCompile Include="PasswordService.cpp" />
     <ClCompile Include="ServerCommand.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ChatRoom.h" />
     <ClInclude Include="ChatServer.h" />
     <ClInclude Include="ClientConnection.h" />
+    <ClInclude Include="PasswordService.h" />
     <ClInclude Include="ServerCommand.h" />
   </ItemGroup>
   <ItemGroup>

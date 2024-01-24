@@ -98,6 +98,12 @@
     <QtMoc Include="UI\QtClient.h" />
     <ClCompile Include="Client.cpp" />
     <ClCompile Include="ClientCommand.cpp" />
+    <ClCompile Include="UI\CredentialsDialog.cpp">
+      <DynamicSource Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">input</DynamicSource>
+      <QtMocFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(Filename).moc</QtMocFileName>
+      <DynamicSource Condition="'$(Configuration)|$(Platform)'=='Release|x64'">input</DynamicSource>
+      <QtMocFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Filename).moc</QtMocFileName>
+    </ClCompile>
     <ClCompile Include="UI\MessageWidget.cpp">
       <DynamicSource Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">input</DynamicSource>
       <QtMocFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(Filename).moc</QtMocFileName>
@@ -115,6 +121,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ClientCommand.h" />
+    <QtMoc Include="UI\CredentialsDialog.h" />
     <ClInclude Include="UI\MessageWidget.h" />
   </ItemGroup>
   <ItemGroup>

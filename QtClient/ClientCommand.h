@@ -1,6 +1,7 @@
 #pragma once
 #include "AbstractCommand.h"
-#include "Client.h"
+
+class Client;
 
 class ClientCommand : public AbstractCommand
 {
