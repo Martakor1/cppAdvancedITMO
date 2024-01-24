@@ -4,11 +4,13 @@
 #include <QByteArray>
 #include "ServerCommand.h"
 #include "CommandParseException.cpp"
+#include "ChatServer.h"
+#include <QIODevice>
 
 using namespace boost::asio;
 
 ClientConnection::ClientConnection(const any_io_executor& context, ChatServer *serv) :
-	socket_(context), message_(), server(serv)
+	socket_(context), message_(), serv(serv)
 {
 }
 
@@ -23,43 +25,42 @@ void ClientConnection::async_handle() {
 
 
 void ClientConnection::receiveMessage(std::shared_ptr<ChatMessage> msg) {
-	server->getChatRoom(msg->getChatId()).addMessage(msg);
+	clientId = msg->getSenderId();
+	serv->getChatRoom(msg->getChatId()).addMessage(msg);
 }
 
-void ClientConnection::sendBytesWithSize(const QByteArray& array) {
-	quint32 size = array.size();
-	QByteArray sizeArray((char*)(&size), 4);
-	socket_.async_write_some(buffer(sizeArray + array), boost::bind(&ClientConnection::on_write, shared_from_this(), _1, _2));
-}
 
-void ClientConnection::sendMessage(std::shared_ptr<ChatMessage> msg) {
-	ServerCommand sendCommand(this, ServerCommand::Domain::msg, ServerCommand::CrudType::create, msg);
+void ClientConnection::sendMessage(ServerCommand::CrudType type, std::shared_ptr<ChatMessage> msg) {
+	ServerCommand sendCommand(this, ServerCommand::Domain::msg, type, msg);
 	sendBytesWithSize(sendCommand.toBytes());
 }
 
 
 void ClientConnection::on_read(const boost::system::error_code& err, size_t bytes) {
 	if (!err) {
-		
-		size_t size = *(size_t*)message_.data();
-		//if (bytes != size + 4) return; //пока так
-
-		try {
-			auto c = ServerCommand(this, QByteArray(message_.data() + 4, bytes - 4));
-			c.exec();
+		QDataStream st(QByteArray(message_.data(), bytes));
+		st.startTransaction();
+		QByteArray jsonData;
+		for (;;) {
+			st.startTransaction();
+			st >> jsonData;
+			if (st.commitTransaction()) {
+				try {
+					auto c = ServerCommand(this, jsonData);
+					c.exec();
+				}
+				catch (CommandParseException& e) {
+					//некорректный json от клиента. Игнорируем...
+					std::cout << e.what() << std::endl;
+				}
+			}
+			else {
+				break;
+			}
 		}
-		catch (CommandParseException& e) {
-			//некорректный json от клиента. Игнорируем...
-			std::cout << e.what() << std::endl;
-		}
-
-		/*std::cout << "red, thread id " << std::this_thread::get_id() << std::endl;
-		std::cout << "message is '" << message_.data() + 4 << "'" << " size " << bytes << std::endl;
-		socket_.async_write_some(buffer(message_, bytes), boost::bind(&ClientConnection::on_write, shared_from_this(), _1, _2));*/
 	}
 	else {
 		std::cout << err.message() << std::endl;
-		//сокет сам уничтожится и закроется, если не будет shared_ptr на this
 	}
 }
 
@@ -71,4 +72,15 @@ void ClientConnection::on_write(const boost::system::error_code& err, size_t byt
 	else {
 		std::cout << err.message() << std::endl;
 	}
+}
+
+const QUuid& ClientConnection::getClientId() {
+	return clientId;
+}
+
+void ClientConnection::sendBytesWithSize(const QByteArray& array) {
+	QByteArray buf;
+	QDataStream st(&buf, QIODevice::WriteOnly);
+	st << array;
+	socket_.async_write_some(buffer(buf.constData(), buf.size()), boost::bind(&ClientConnection::on_write, shared_from_this(), _1, _2));
 }

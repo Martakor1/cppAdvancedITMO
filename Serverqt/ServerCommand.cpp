@@ -1,5 +1,6 @@
 #include "ServerCommand.h"
 #include "ChatMessage.h"
+#include "ClientConnection.h"
 
 ServerCommand::ServerCommand(ClientConnection* cconn, const QByteArray& rawJson) :
 	AbstractCommand(rawJson), clientConn(cconn)

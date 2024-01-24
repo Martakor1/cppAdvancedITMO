@@ -5,6 +5,7 @@
 #include "ClientCommand.h"
 #include "CommandParseException.cpp"
 #include <iostream>
+#include <QTimer>
 
 
 
@@ -12,10 +13,16 @@ Client::Client() : QObject(), clientSocket(this), user("martakor")
 {
 	connect(&clientSocket, &QTcpSocket::connected, this, &Client::onSokConnected);
 	connect(&clientSocket, &QTcpSocket::disconnected, this, &Client::onSokDisconnected);
-	connect(&clientSocket, &QTcpSocket::errorOccurred, this, &Client::socketError);
+	connect(&clientSocket, &QTcpSocket::errorOccurred, this, &Client::onSokError);
 	connect(&clientSocket, &QTcpSocket::readyRead, this, &Client::onSokReadyRead);
 
    connectToServer();
+}
+
+
+void Client::onSokError(QAbstractSocket::SocketError sokErr) {
+   emit socketError(sokErr);
+   QTimer::singleShot(5000, this, &Client::connectToServer);
 }
 
 const QTcpSocket& Client::getSocket() const
@@ -36,7 +43,8 @@ void Client::receiveMessage(std::shared_ptr<ChatMessage> msg) // подумат�
 }
 
 void Client::updateMessage(std::shared_ptr<ChatMessage> msg) {
-   msgContainer.insert(msg); //проверить вставит ли вместо старого
+   msgContainer.erase(msg);
+   msgContainer.insert(msg);
    emit messageUpdated(*msg);
 }
 
@@ -52,14 +60,19 @@ const User& Client::getUser() const
 }
 
 void Client::onSokConnected() {
-   ChatMessage msg("Hello world!", user.getId(), QUuid::createUuid(), false);
+   for (const auto& t : msgContainer) {
+      if (!t->getStatus()) {
+         sendMessage(t);
+      }
+   }
+   /*ChatMessage msg("Hello world!", user.getId(), QUuid::createUuid(), false);
    QJsonObject wrapper;
    wrapper["domain"] = "msg";
    wrapper["operation"] = "create";
    wrapper["dto"] = msg.toJson();
    QJsonDocument a(wrapper);
    auto s = QDataStream(&clientSocket);
-   s << a.toJson(QJsonDocument::Compact);
+   s << a.toJson(QJsonDocument::Compact);*/
 }
 
 void Client::onSokReadyRead() {
@@ -88,12 +101,18 @@ void Client::onSokReadyRead() {
    }
 }
 
-void Client::sendMessage(const ChatMessage& msg)
-{
+void Client::onMessageCreated(const ChatMessage& msg) {
    auto pair = msgContainer.insert(std::make_shared<ChatMessage>(msg));
-   ClientCommand sendCommand(this, ClientCommand::Domain::msg, ClientCommand::CrudType::create, *pair.first);
-   QDataStream dataStream(&clientSocket);
-   dataStream << sendCommand.toBytes();
+   sendMessage(*pair.first);
+}
+
+void Client::sendMessage(std::shared_ptr<ChatMessage> msgPtr)
+{
+   ClientCommand sendCommand(this, ClientCommand::Domain::msg, ClientCommand::CrudType::create, msgPtr);
+   if (clientSocket.state() == QAbstractSocket::ConnectedState) {
+      QDataStream dataStream(&clientSocket);
+      dataStream << sendCommand.toBytes();
+   }
 }
 
 

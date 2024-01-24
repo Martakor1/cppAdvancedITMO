@@ -13,7 +13,7 @@ QtClient::QtClient(QWidget *parent)
 
     connect(&client, &Client::socketError, this, &QtClient::onSocketError);
     connect(&client, &Client::messageReceived, this, &QtClient::showChatMessage);
-    connect(this, &QtClient::messageCreated, &client, &Client::sendMessage);
+    connect(this, &QtClient::messageCreated, &client, &Client::onMessageCreated);
     connect(&client, &Client::messageUpdated, this, &QtClient::onMessageUpdated);
 
     connect(ui.scrollArea->verticalScrollBar(), &QScrollBar::rangeChanged, this, &QtClient::onScrollRangeChanged);
@@ -51,8 +51,11 @@ void QtClient::showChatMessage(const ChatMessage& msg) {
 }
 
 void QtClient::onMessageUpdated(const ChatMessage& msg) {
-   auto widgetPtr = widgets.at(msg.getId());
-   widgetPtr->updateFromMsg(msg);
+   auto widgetIter = widgets.find(msg.getId());
+   if (widgetIter != widgets.end()) {
+      (*widgetIter).second->updateFromMsg(msg);
+   }
+   
 }
 
 void QtClient::onSocketError(QAbstractSocket::SocketError socketError)
@@ -66,7 +69,7 @@ void QtClient::onSocketError(QAbstractSocket::SocketError socketError)
       break;
    case QAbstractSocket::ConnectionRefusedError:
       showInformation("The connection was refused by the peer. "
-         "Make sure the fortune server is running, "
+         "Make sure the server is running, "
          "and check that the host name and port "
          "settings are correct.");
       break;
@@ -80,6 +83,7 @@ void QtClient::onSendClicked()
    QString text = ui.messageEdit->text();
    if (!text.trimmed().isEmpty()) {
       ChatMessage msg(text, client.getUser().getId(), QUuid::createUuid(), false); //TODO chatId
+      showChatMessage(msg);
       emit messageCreated(msg);
    }
    ui.messageEdit->clear();

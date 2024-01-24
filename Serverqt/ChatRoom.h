@@ -3,6 +3,7 @@
 #include <unordered_set>
 #include "ClientConnection.h"
 #include "ChatMessage.h"
+#include <memory>
 
 class ChatRoom {
 private:

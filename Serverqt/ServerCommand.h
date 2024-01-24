@@ -1,6 +1,7 @@
 #pragma once
 #include "AbstractCommand.h"
-#include "ClientConnection.h"
+
+class ClientConnection;
 
 class ServerCommand : public AbstractCommand
 {

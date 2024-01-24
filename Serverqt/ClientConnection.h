@@ -1,27 +1,26 @@
 #pragma once
 #include <boost/asio.hpp>
-#include <boost/enable_shared_from_this.hpp>
 #include <boost/asio/error.hpp>
 #include <string>
 #include "ChatMessage.h"
-#include "ChatServer.h"
+#include "ServerCommand.h"
 
-using namespace boost::asio;
+class ChatServer;
 
-class ClientConnection : public boost::enable_shared_from_this<ClientConnection> {
+class ClientConnection : public std::enable_shared_from_this<ClientConnection> {
 public:
 	static const size_t maxBufferSize = 512;
 private:
 	boost::asio::ip::tcp::socket socket_;
 	std::array<char, maxBufferSize> message_;
-	QUuid cliendId;
-	ChatServer *server;
+	QUuid clientId;
+	ChatServer *serv;
 public:
-	ClientConnection(const any_io_executor& context, ChatServer *serv);
-	ip::tcp::socket& get_socket();
+	ClientConnection(const boost::asio::any_io_executor& context, ChatServer *serv);
+	boost::asio::ip::tcp::socket& get_socket();
 	void async_handle();
 	void receiveMessage(std::shared_ptr<ChatMessage> msg);
-	void sendMessage(std::shared_ptr<ChatMessage> msg);
+	void sendMessage(ServerCommand::CrudType type, std::shared_ptr<ChatMessage> msg);
 	const QUuid& getClientId();
 
 private:

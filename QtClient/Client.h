@@ -33,19 +33,21 @@ private slots:
 	void onSokConnected();
 	void onSokDisconnected();
 	void onSokReadyRead();
+	void onSokError(QAbstractSocket::SocketError socketError);
 
 public slots:
-	void sendMessage(const ChatMessage &msg);
+	void onMessageCreated(const ChatMessage& msg);
 	void connectToServer();
 
 signals:
 	void messageReceived(const ChatMessage &msg);
 	void messageUpdated(const ChatMessage &msg);
-	void socketError(QAbstractSocket::SocketError socketError);
+	void socketError(QAbstractSocket::SocketError sokErr);
 
 public:
 	Client();
 	void receiveMessage(std::shared_ptr<ChatMessage> msg);
+	void sendMessage(std::shared_ptr<ChatMessage> msg);
 	void updateMessage(std::shared_ptr<ChatMessage> msg);
 	const QTcpSocket& getSocket() const;
 	const User& getUserById(const QUuid& id) const;

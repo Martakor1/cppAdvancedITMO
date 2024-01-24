@@ -6,6 +6,7 @@
 #include <boost/bind.hpp>
 #include <boost/asio/error.hpp>
 #include "ChatServer.h"
+#include "ClientConnection.h"
 
 using namespace boost::asio;
 

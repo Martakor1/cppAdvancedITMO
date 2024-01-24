@@ -19,6 +19,7 @@ public:
 	const QUuid& getId() const;
 	const QUuid& getChatId() const;
 	bool getStatus() const;
+	void setStatus(bool isSended);
 	virtual QJsonObject toJson() const override;
 	~ChatMessage();
 };
